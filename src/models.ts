@@ -4,12 +4,7 @@ export const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
    logging: false,
 });
 
-export class User extends Model {
-   declare username: string;
-   declare email: string;
-   declare pseudo: string;
-   declare password: string;
-}
+export class User extends Model {}
 
 User.init(
    {
@@ -27,6 +22,7 @@ User.init(
          type: DataTypes.STRING,
          allowNull: false,
          unique: true,
+         validate: { isEmail: true, notEmpty: true },
       },
       pseudo: {
          type: DataTypes.STRING,

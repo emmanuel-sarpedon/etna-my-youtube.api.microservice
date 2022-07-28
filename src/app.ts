@@ -1,40 +1,65 @@
 import cors from "cors";
-import express from "express";
+import express, { RequestHandler, Router } from "express";
 import * as fs from "fs";
 require("dotenv").config();
 import { sequelize } from "~/models";
+import { ValidationChain } from "express-validator";
+import { validatorMiddleware } from "~/validators/validatorMiddleware";
+import log4js from "log4js";
 
+const logger = log4js.getLogger();
+logger.level = "trace";
+
+/* 1 - Basic setup for express server. */
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+/* 2 - Importing all the routes from the route's folder. */
 const routes: string[] = fs.readdirSync("./src/routes");
-
-console.log(routes);
-
-/* Looping through the routes folder and importing all the routes. */
+const router = Router();
+export type Endpoint = {
+   method: "get" | "post" | "put" | "delete";
+   path: string;
+   validatorSchema?: ValidationChain[];
+   handler: RequestHandler;
+};
 for (const route of routes) {
    if (route.includes(".routes.ts")) {
       try {
-         const routeModule = require(`./routes/${route}`);
-         app.use(routeModule.router);
-         console.log("Import route : " + route);
+         const endpoints: Endpoint[] = require(`./routes/${route}`).endpoints;
+         endpoints.forEach((endpoint: Endpoint) => {
+            const { method, path, validatorSchema, handler } = endpoint;
+
+            if (validatorSchema)
+               router[method](
+                  path,
+                  validatorSchema,
+                  validatorMiddleware,
+                  handler
+               );
+            else router[method](path, handler);
+         });
+
+         logger.info("Import route : " + route);
       } catch (e) {
-         console.error(e);
+         logger.error(e);
       }
    }
 }
+app.use(router);
 
+/* 3 - Trying to connect to the database and if it fails it will throw an error. */
 (async () => {
    try {
       sequelize.sync({ alter: true }).then(() => {
-         console.log("Connection has been established successfully.");
+         logger.trace("Connection has been established successfully.");
       });
       app.listen(process.env.PORT || 3000, () =>
-         console.log("Server started on port " + (process.env.PORT || "3000"))
+         logger.trace("Server started on port " + (process.env.PORT || "3000"))
       );
    } catch (error) {
-      console.error("Unable to connect to the database:", error);
+      logger.error("Unable to connect to the database:", error);
    }
 })();

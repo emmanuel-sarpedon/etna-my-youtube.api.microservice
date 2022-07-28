@@ -1,12 +1,12 @@
-import express, { Request, Response } from "express";
-import * as service from "~/services/user.services";
+import { UserCreationSchema } from "~/validators/user.validators";
+import { registerNewUser } from "~/controllers/user.controllers";
+import { Endpoint } from "~/app";
 
-export const router = express.Router();
-
-router.post("/users", async (req: Request, res: Response) => {
-   // hide password field from the request body
-   const { password, ...fields } = req.body;
-   const user = await service.findUser({ ...fields });
-
-   return res.json(user);
-});
+export const endpoints: Endpoint[] = [
+   {
+      method: "post",
+      path: "/users",
+      validatorSchema: UserCreationSchema,
+      handler: registerNewUser,
+   },
+];
