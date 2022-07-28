@@ -5,7 +5,31 @@ export const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
    logging: false,
 });
 
-export class User extends Model {}
+export class User extends Model {
+   declare id: number;
+   declare username: string;
+   declare pseudo: string;
+   declare createdAt: Date;
+   declare email: string;
+
+   getPublicFields(isAuthenticated: boolean = false) {
+      if (isAuthenticated)
+         return {
+            id: this.id,
+            username: this.username,
+            pseudo: this.pseudo,
+            created_at: this.createdAt,
+            email: this.email,
+         };
+
+      return {
+         id: this.id,
+         username: this.username,
+         pseudo: this.pseudo,
+         created_at: this.createdAt,
+      };
+   }
+}
 
 User.init(
    {

@@ -1,15 +1,18 @@
 import { Request, Response } from "express";
 import * as service from "~/services/user.services";
 
-export async function registerNewUser(
-   req: Request,
-   res: Response,
-) {
+export async function registerNewUser(req: Request, res: Response) {
    if (await service.isUserExist(req.body)) {
-      res.status(400).json({
+      return res.status(400).json({
          message: "Bad Request",
          code: 400,
          data: ["User already exist"],
       });
-   } else res.json(req.body);
+   }
+
+   const newUser = await service.createNewUser(req.body);
+
+   return res
+      .status(201)
+      .json({ message: "Ok", data: newUser.getPublicFields() });
 }
