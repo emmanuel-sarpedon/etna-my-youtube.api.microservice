@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import log4js from "log4js";
 
-const logger = log4js.getLogger();
+const logger = log4js.getLogger("validator");
 logger.level = "trace";
+
 
 export function validatorMiddleware(
    req: Request,

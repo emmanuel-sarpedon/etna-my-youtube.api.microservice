@@ -1,6 +1,6 @@
 import { UserCreationSchema } from "~/validators/user.validators";
 import { registerNewUser } from "~/controllers/user.controllers";
-import { Endpoint } from "~/app";
+import { Endpoint } from "~/@types/route.type";
 
 export const endpoints: Endpoint[] = [
    {
