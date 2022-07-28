@@ -16,3 +16,9 @@ export async function registerNewUser(req: Request, res: Response) {
       .status(201)
       .json({ message: "Ok", data: newUser.getPublicFields() });
 }
+
+export async function loginUser(req: Request, res: Response) {
+   const user = await service.getUserByLogin(req.body.login);
+
+   if (user) return res.json(user);
+}

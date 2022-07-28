@@ -1,7 +1,8 @@
 import log4js from "log4js";
 import { NextFunction, Request, Response } from "express";
 
-const logger = log4js.getLogger("HTTP REQUEST");
+const logger = log4js.getLogger("HTTP");
+logger.level = "trace";
 
 export function traceMiddleware(
    req: Request,

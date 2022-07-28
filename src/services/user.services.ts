@@ -44,6 +44,14 @@ export async function getUsers(fields: {
    });
 }
 
+export async function getUserByLogin(login: string) {
+   return await User.findOne({
+      where: {
+         [Op.or]: [{ username: login }, { pseudo: login }, { email: login }],
+      },
+   });
+}
+
 /**
  * It returns a promise that resolves to true if there's at least one user in the database that matches the given fields
  * @param fields - { [key: string]: string }
