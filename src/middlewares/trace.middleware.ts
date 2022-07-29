@@ -11,10 +11,10 @@ export function traceMiddleware(
 ) {
    res.on("finish", () => {
       if (res.statusCode >= 200 && res.statusCode < 300)
-         logger.info(`${req.method} ${req.originalUrl} ${res.statusCode} ✅`);
+         logger.info(`[${req.method}] ${req.originalUrl} ${res.statusCode} ✅`);
 
       if (res.statusCode >= 400 && res.statusCode < 500) {
-         logger.error(`${req.method} ${req.originalUrl} ${res.statusCode} 🚫`);
+         logger.error(`[${req.method}] ${req.originalUrl} ${res.statusCode} 🚫`);
       }
    });
    next();

@@ -11,23 +11,20 @@ export class User extends Model {
    declare pseudo: string;
    declare createdAt: Date;
    declare email: string;
+   declare password: string;
 
    getPublicFields(isAuthenticated: boolean = false) {
-      if (isAuthenticated)
-         return {
-            id: this.id,
-            username: this.username,
-            pseudo: this.pseudo,
-            created_at: this.createdAt,
-            email: this.email,
-         };
-
-      return {
+      const publicFields: Partial<User> = {
          id: this.id,
          username: this.username,
          pseudo: this.pseudo,
-         created_at: this.createdAt,
+         createdAt: this.createdAt,
+         email: this.email,
       };
+
+      if (!isAuthenticated) delete publicFields.email;
+
+      return publicFields;
    }
 }
 

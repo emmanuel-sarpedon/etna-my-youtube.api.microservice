@@ -1,14 +1,10 @@
 import { Request, Response } from "express";
 import * as service from "~/services/user.services";
+import * as error from "~/errors/errors";
 
 export async function registerNewUser(req: Request, res: Response) {
-   if (await service.isUserExist(req.body)) {
-      return res.status(400).json({
-         message: "Bad Request",
-         code: 400,
-         data: ["User already exist"],
-      });
-   }
+   if (await service.isUserExist(req.body))
+      return error.badRequest(res, ["User already exist"]);
 
    const newUser = await service.createNewUser(req.body);
 
@@ -20,5 +16,14 @@ export async function registerNewUser(req: Request, res: Response) {
 export async function loginUser(req: Request, res: Response) {
    const user = await service.getUserByLogin(req.body.login);
 
-   if (user) return res.json(user);
+   if (user && service.isCorrectPassword(req.body.password, user.password))
+      return res.status(200).json({
+         message: "Ok",
+         token: {
+            token: service.getJWT(user),
+            user: user.getPublicFields(true),
+         },
+      });
+
+   return error.badCredentials(res);
 }

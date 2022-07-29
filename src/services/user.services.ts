@@ -2,6 +2,7 @@ import { User } from "~/models";
 import { Op } from "sequelize";
 import { SHA256 } from "crypto-js";
 import encBase64 from "crypto-js/enc-base64";
+import jwt, { Secret } from "jsonwebtoken";
 
 /**
  * It creates a new user in the database
@@ -44,6 +45,11 @@ export async function getUsers(fields: {
    });
 }
 
+/**
+ * It returns a user from the database, based on the login parameter
+ * @param {string} login - string
+ * @returns A promise that resolves to a user object
+ */
 export async function getUserByLogin(login: string) {
    return await User.findOne({
       where: {
@@ -63,6 +69,35 @@ export function isUserExist(fields: {
    return getUsers(fields).then((users: User[]) => users.length > 0);
 }
 
+/**
+ * It takes a string, hashes it, and returns the hash as a string
+ * @param {string} password - The password to hash.
+ * @returns A hash of the password
+ */
 export function hashPassword(password: string): string {
    return SHA256(password).toString(encBase64);
+}
+
+/**
+ * If the hash is undefined, return false, otherwise return true if the hash is equal to the hashed password.
+ * @param {string} password - The password to hash.
+ * @param {string | undefined} hash - The hash that was generated from the password.
+ * @returns A boolean value.
+ */
+export function isCorrectPassword(password: string, hash: string | undefined): boolean {
+   return hash === hashPassword(password);
+}
+
+/**
+ * It takes a user object and returns a JWT
+ * @param {User} user - User - The user object that we want to generate a JWT for.
+ * @returns A JWT token
+ */
+export function getJWT(user: User): string {
+   return jwt.sign(
+      user.getPublicFields(true),
+      process.env.JWT_SECRET_KEY as Secret, {
+         expiresIn: "1h",
+       }
+   );
 }
