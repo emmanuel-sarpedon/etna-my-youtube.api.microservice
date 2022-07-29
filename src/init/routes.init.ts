@@ -5,6 +5,7 @@ import { Endpoint } from "~/@types/route.type";
 import { Router } from "express";
 
 import log4js from "log4js";
+import { authMiddleware } from "~/middlewares/auth.middleware";
 
 const logger = log4js.getLogger("ROUTES");
 logger.level = "trace";
@@ -23,17 +24,26 @@ export default () => {
                require(`../routes/${route}`).endpoints;
 
             endpoints.forEach((endpoint: Endpoint, index: number) => {
-               const { method, path, validatorSchema, handler } = endpoint;
+               const {
+                  method,
+                  path,
+                  validatorSchema,
+                  isAuthenticated,
+                  handler,
+               } = endpoint;
 
                /* A dynamic way to add routes to the router. */
                router[method](
                   path,
                   validatorSchema ? validatorSchema : [],
                   validatorSchema ? validatorMiddleware : [],
+                  isAuthenticated ? authMiddleware : [],
                   handler
                );
 
-               logger.trace(`﹒ ${index + 1} - [${method.toUpperCase()}] ${path}`);
+               logger.trace(
+                  `﹒ ${index + 1} - [${method.toUpperCase()}] ${path}`
+               );
             });
          } catch (e) {
             logger.error(e);

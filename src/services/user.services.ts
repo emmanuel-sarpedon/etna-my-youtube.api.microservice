@@ -45,17 +45,25 @@ export async function getUsers(fields: {
    });
 }
 
+export async function getUserById(id: string): Promise<User | null> {
+   return await User.findByPk(id);
+}
+
 /**
  * It returns a user from the database, based on the login parameter
  * @param {string} login - string
  * @returns A promise that resolves to a user object
  */
-export async function getUserByLogin(login: string) {
+export async function getUserByLogin(login: string): Promise<User | null> {
    return await User.findOne({
       where: {
          [Op.or]: [{ username: login }, { pseudo: login }, { email: login }],
       },
    });
+}
+
+export async function deleteUser(user: User): Promise<void> {
+   await user.destroy();
 }
 
 /**
@@ -84,7 +92,10 @@ export function hashPassword(password: string): string {
  * @param {string | undefined} hash - The hash that was generated from the password.
  * @returns A boolean value.
  */
-export function isCorrectPassword(password: string, hash: string | undefined): boolean {
+export function isCorrectPassword(
+   password: string,
+   hash: string | undefined
+): boolean {
    return hash === hashPassword(password);
 }
 
@@ -96,8 +107,9 @@ export function isCorrectPassword(password: string, hash: string | undefined): b
 export function getJWT(user: User): string {
    return jwt.sign(
       user.getPublicFields(true),
-      process.env.JWT_SECRET_KEY as Secret, {
-         expiresIn: "1h",
-       }
+      process.env.JWT_SECRET_KEY as Secret,
+      {
+         expiresIn: "7d",
+      }
    );
 }

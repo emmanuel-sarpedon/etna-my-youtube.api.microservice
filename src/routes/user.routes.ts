@@ -15,4 +15,11 @@ export const endpoints: Endpoint[] = [
       validatorSchema: validator.userLoginSchema,
       handler: controller.loginUser,
    },
+   {
+      method: "delete",
+      path: "/user/:id",
+      validatorSchema: validator.userDeletionSchema,
+      isAuthenticated: true,
+      handler: controller.deleteUser,
+   }
 ];

@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 export const userCreationSchema = [
    body("username").isByteLength({ min: 3, max: 20 }),
@@ -12,4 +12,6 @@ export const userCreationSchema = [
 export const userLoginSchema = [
    body("login").not().isEmpty(),
    body("password").not().isEmpty(),
-]
+];
+
+export const userDeletionSchema = [param("id").isInt()];
