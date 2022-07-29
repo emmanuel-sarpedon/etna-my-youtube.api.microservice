@@ -5,7 +5,7 @@ import { Endpoint } from "~/@types/route.type";
 import { Router } from "express";
 
 import log4js from "log4js";
-import { authMiddleware } from "~/middlewares/auth.middleware";
+import { requiredAuth, optionalAuth } from "~/middlewares/auth.middleware";
 
 const logger = log4js.getLogger("ROUTES");
 logger.level = "trace";
@@ -28,7 +28,7 @@ export default () => {
                   method,
                   path,
                   validatorSchema,
-                  isAuthenticated,
+                  authentication,
                   handler,
                   description,
                } = endpoint;
@@ -38,7 +38,8 @@ export default () => {
                   path,
                   validatorSchema ? validatorSchema : [],
                   validatorSchema ? validatorMiddleware : [],
-                  isAuthenticated ? authMiddleware : [],
+                  authentication === "required" ? requiredAuth : [],
+                  authentication === "optional" ? optionalAuth : [],
                   handler
                );
 

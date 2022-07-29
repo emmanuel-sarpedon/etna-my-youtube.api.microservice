@@ -13,3 +13,9 @@ export function badCredentials(res: Response) {
       message: "Unauthorized",
    });
 }
+
+export function ressourcesNotFound(res: Response) {
+   return res.status(404).json({
+      message: "Not Found",
+   });
+}

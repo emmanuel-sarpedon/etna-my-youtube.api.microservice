@@ -76,3 +76,15 @@ export async function getUsersByPseudo(req: Request, res: Response) {
       pager: { current: page, total: total },
    });
 }
+
+export async function getUserById(req: CustomRequest, res: Response) {
+   const user = await service.getUserById(req.params.id);
+
+   if (user)
+      return res.status(200).json({
+         message: "Ok",
+         data: user.getPublicFields(req.isAuthenticated),
+      });
+
+   return error.ressourcesNotFound(res);
+}

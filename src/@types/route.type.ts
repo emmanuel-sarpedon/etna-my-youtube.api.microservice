@@ -6,6 +6,6 @@ export type Endpoint = {
    path: string;
    handler: RequestHandler;
    validatorSchema?: ValidationChain[];
-   isAuthenticated?: boolean;
+   authentication: "required" | "optional" | "notRequired";
    description?: string;
 };

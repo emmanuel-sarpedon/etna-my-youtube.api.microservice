@@ -28,8 +28,10 @@ export const userUpdateSchema = [
       .optional(),
 ];
 
-export const userListSchema = [
+export const usersListSchema = [
    body("pseudo").isByteLength({ min: 1, max: 20 }),
    body("page").isInt({ min: 0 }),
    body("perPage").isInt({ min: 1 }),
 ];
+
+export const userListSchema = [param("id").isInt()];

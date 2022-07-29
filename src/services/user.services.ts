@@ -4,11 +4,6 @@ import { SHA256 } from "crypto-js";
 import encBase64 from "crypto-js/enc-base64";
 import jwt, { Secret } from "jsonwebtoken";
 
-/**
- * It creates a new user in the database
- * @param fields - { [key: string]: string }
- * @returns A promise of a user
- */
 export async function createNewUser(fields: {
    username: string;
    email: string;
@@ -24,11 +19,6 @@ export async function createNewUser(fields: {
    });
 }
 
-/**
- * It returns all users that match the given fields
- * @param fields - { [key: string]: string }
- * @returns An array of users
- */
 export async function getUsers(fields: {
    [key: string]: string;
 }): Promise<User[]> {
@@ -49,11 +39,6 @@ export async function getUserById(id: string): Promise<User | null> {
    return await User.findByPk(id);
 }
 
-/**
- * It returns a user from the database, based on the login parameter
- * @param {string} login - string
- * @returns A promise that resolves to a user object
- */
 export async function getUserByLogin(login: string): Promise<User | null> {
    return await User.findOne({
       where: {
@@ -98,11 +83,6 @@ export async function deleteUser(user: User): Promise<void> {
    await user.destroy();
 }
 
-/**
- * It returns a promise that resolves to true if there's at least one user in the database that matches the given fields
- * @param fields - { [key: string]: string }
- * @returns A promise that resolves to a boolean.
- */
 export function isUserExist(fields: {
    [key: string]: string;
 }): Promise<boolean> {
