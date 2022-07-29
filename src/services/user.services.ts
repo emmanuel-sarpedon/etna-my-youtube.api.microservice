@@ -62,6 +62,22 @@ export async function getUserByLogin(login: string): Promise<User | null> {
    });
 }
 
+export async function updateUser(
+   user: User,
+   fields: { [key: string]: string }
+): Promise<User> {
+   const { username, pseudo, email, password } = fields;
+
+   const fieldsToUpdate: { [key: string]: string } = {};
+
+   if (username) fieldsToUpdate.username = username;
+   if (pseudo) fieldsToUpdate.pseudo = pseudo;
+   if (email) fieldsToUpdate.email = email;
+   if (password) fieldsToUpdate.password = hashPassword(password);
+
+   return await user.update({ ...fieldsToUpdate });
+}
+
 export async function deleteUser(user: User): Promise<void> {
    await user.destroy();
 }

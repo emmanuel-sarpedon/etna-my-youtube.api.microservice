@@ -39,3 +39,14 @@ export async function deleteUser(req: CustomRequest, res: Response) {
 
    return error.badCredentials(res);
 }
+
+export async function updateUser(req: CustomRequest, res: Response) {
+   const user = await service.getUserById(req.params.id);
+
+   if (user && user.id === req.user?.id) {
+      const userUpdated = await service.updateUser(user, req.body);
+      return res.status(200).json({ message: "Ok", data: userUpdated.getPublicFields(true) });
+   }
+
+   return error.badCredentials(res);
+}

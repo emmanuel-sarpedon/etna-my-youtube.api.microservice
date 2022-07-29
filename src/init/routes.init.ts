@@ -30,6 +30,7 @@ export default () => {
                   validatorSchema,
                   isAuthenticated,
                   handler,
+                  description,
                } = endpoint;
 
                /* A dynamic way to add routes to the router. */
@@ -42,7 +43,9 @@ export default () => {
                );
 
                logger.trace(
-                  `﹒ ${index + 1} - [${method.toUpperCase()}] ${path}`
+                  //prettier-ignore
+                  `﹒ ${index + 1} - [${method.toUpperCase()}] ${path} - ${description}`
+                  // ﹒ 1 - [POST] /users - Register a new user
                );
             });
          } catch (e) {

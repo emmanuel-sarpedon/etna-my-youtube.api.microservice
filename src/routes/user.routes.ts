@@ -8,12 +8,14 @@ export const endpoints: Endpoint[] = [
       path: "/users",
       validatorSchema: validator.userCreationSchema,
       handler: controller.registerNewUser,
+      description: "Register a new user",
    },
    {
       method: "post",
       path: "/auth",
       validatorSchema: validator.userLoginSchema,
       handler: controller.loginUser,
+      description: "Login a user",
    },
    {
       method: "delete",
@@ -21,5 +23,14 @@ export const endpoints: Endpoint[] = [
       validatorSchema: validator.userDeletionSchema,
       isAuthenticated: true,
       handler: controller.deleteUser,
-   }
+      description: "Delete a user",
+   },
+   {
+      method: "put",
+      path: "/user/:id",
+      validatorSchema: validator.userUpdateSchema,
+      isAuthenticated: true,
+      handler: controller.updateUser,
+      description: "Update a user",
+   },
 ];

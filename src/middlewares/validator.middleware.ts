@@ -5,7 +5,6 @@ import log4js from "log4js";
 const logger = log4js.getLogger("validator");
 logger.level = "trace";
 
-
 export function validatorMiddleware(
    req: Request,
    res: Response,

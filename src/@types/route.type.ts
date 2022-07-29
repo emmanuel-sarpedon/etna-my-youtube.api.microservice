@@ -7,4 +7,5 @@ export type Endpoint = {
    handler: RequestHandler;
    validatorSchema?: ValidationChain[];
    isAuthenticated?: boolean;
+   description?: string;
 };

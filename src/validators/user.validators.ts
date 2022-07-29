@@ -15,3 +15,15 @@ export const userLoginSchema = [
 ];
 
 export const userDeletionSchema = [param("id").isInt()];
+
+export const userUpdateSchema = [
+   param("id").isInt(),
+
+   body("username").isByteLength({ min: 3, max: 20 }).optional(),
+   body("pseudo").isByteLength({ min: 3, max: 20 }).optional(),
+   body("email").isEmail().optional(),
+   body("password")
+      .isByteLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters long")
+      .optional(),
+];
