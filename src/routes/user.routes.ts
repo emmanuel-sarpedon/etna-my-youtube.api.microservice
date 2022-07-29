@@ -33,4 +33,11 @@ export const endpoints: Endpoint[] = [
       handler: controller.updateUser,
       description: "Update a user",
    },
+   {
+      method: "get",
+      path: "/users",
+      validatorSchema: validator.userListSchema,
+      handler: controller.getUsersByPseudo,
+      description: "Get users by pseudo",
+   },
 ];

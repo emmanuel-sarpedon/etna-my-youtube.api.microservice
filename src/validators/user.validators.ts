@@ -27,3 +27,9 @@ export const userUpdateSchema = [
       .withMessage("Password must be at least 8 characters long")
       .optional(),
 ];
+
+export const userListSchema = [
+   body("pseudo").isByteLength({ min: 1, max: 20 }),
+   body("page").isInt({ min: 0 }),
+   body("perPage").isInt({ min: 1 }),
+];

@@ -45,8 +45,34 @@ export async function updateUser(req: CustomRequest, res: Response) {
 
    if (user && user.id === req.user?.id) {
       const userUpdated = await service.updateUser(user, req.body);
-      return res.status(200).json({ message: "Ok", data: userUpdated.getPublicFields(true) });
+      return res
+         .status(200)
+         .json({ message: "Ok", data: userUpdated.getPublicFields(true) });
    }
 
    return error.badCredentials(res);
+}
+
+export async function getUsersByPseudo(req: Request, res: Response) {
+   const { pseudo, page, perPage } = req.body;
+
+   if (page === 0)
+      return error.badRequest(res, ["Page number must be greater than 0"]);
+
+   const { rows, count } = await service.getUsersByPseudo(
+      pseudo,
+      page,
+      perPage
+   );
+
+   const total = Math.ceil(count / perPage);
+
+   if (page > total && page > 1)
+      return error.badRequest(res, ["Page not found"]);
+
+   return res.status(200).json({
+      message: "Ok",
+      data: rows.map((user) => user.getPublicFields()),
+      pager: { current: page, total: total },
+   });
 }

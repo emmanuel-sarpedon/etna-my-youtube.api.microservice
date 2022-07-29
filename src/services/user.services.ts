@@ -62,6 +62,22 @@ export async function getUserByLogin(login: string): Promise<User | null> {
    });
 }
 
+export async function getUsersByPseudo(
+   pseudo: string,
+   page: number,
+   perPage: number
+): Promise<{ rows: User[]; count: number }> {
+   return await User.findAndCountAll({
+      where: {
+         pseudo: {
+            [Op.iLike]: `%${pseudo}%`,
+         },
+      },
+      limit: perPage,
+      offset: perPage * (page - 1),
+   });
+}
+
 export async function updateUser(
    user: User,
    fields: { [key: string]: string }
