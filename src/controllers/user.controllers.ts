@@ -17,40 +17,42 @@ export async function registerNewUser(req: Request, res: Response) {
 export async function loginUser(req: Request, res: Response) {
    const user = await service.getUserByLogin(req.body.login);
 
-   if (user && service.isCorrectPassword(req.body.password, user.password))
-      return res.status(200).json({
-         message: "Ok",
-         token: {
-            token: service.getJWT(user),
-            user: user.getPublicFields(true),
-         },
-      });
+   if (!user || !service.isCorrectPassword(req.body.password, user.password))
+      return error.badCredentials(res);
 
-   return error.badCredentials(res);
+   return res.status(200).json({
+      message: "Ok",
+      token: {
+         token: service.getJWT(user),
+         user: user.getPublicFields(true),
+      },
+   });
 }
 
 export async function deleteUser(req: CustomRequest, res: Response) {
+   if (req.params.id !== req.user?.id.toString())
+      return error.badCredentials(res);
+
    const user = await service.getUserById(req.params.id);
 
-   if (user && user.id === req.user?.id) {
-      await service.deleteUser(user);
-      return res.status(204).send();
-   }
+   if (!user) return error.ressourcesNotFound(res);
 
-   return error.badCredentials(res);
+   await service.deleteUser(user);
+   return res.status(204).send();
 }
 
 export async function updateUser(req: CustomRequest, res: Response) {
    const user = await service.getUserById(req.params.id);
 
-   if (user && user.id === req.user?.id) {
-      const userUpdated = await service.updateUser(user, req.body);
-      return res
-         .status(200)
-         .json({ message: "Ok", data: userUpdated.getPublicFields(true) });
-   }
+   if (req.params.id !== req.user?.id.toString())
+      return error.badCredentials(res);
 
-   return error.badCredentials(res);
+   if (!user) return error.ressourcesNotFound(res);
+
+   const userUpdated = await service.updateUser(user, req.body);
+   return res
+      .status(200)
+      .json({ message: "Ok", data: userUpdated.getPublicFields(true) });
 }
 
 export async function getUsersByPseudo(req: Request, res: Response) {

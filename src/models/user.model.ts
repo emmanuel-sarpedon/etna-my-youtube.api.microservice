@@ -1,9 +1,6 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
-require("dotenv").config();
-
-export const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
-   logging: false,
-});
+import { DataTypes, Model } from "sequelize";
+import { sequelize } from "~/init/database.init";
+import { Video } from "~/models/video.model";
 
 export class User extends Model {
    declare id: number;
@@ -58,3 +55,5 @@ User.init(
    },
    { sequelize }
 );
+
+User.hasMany(Video, { foreignKey: "user" });

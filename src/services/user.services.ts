@@ -1,4 +1,4 @@
-import { User } from "~/models";
+import { User } from "~/models/user.model";
 import { Op } from "sequelize";
 import { SHA256 } from "crypto-js";
 import encBase64 from "crypto-js/enc-base64";

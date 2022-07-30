@@ -4,6 +4,7 @@ import databaseInit from "~/init/database.init";
 import routesInit from "~/init/routes.init";
 import { traceMiddleware } from "~/middlewares/trace.middleware";
 import log4js from "log4js";
+import fileUpload from "express-fileupload";
 
 const logger = log4js.getLogger("APP");
 logger.level = "trace";
@@ -13,6 +14,7 @@ export const app = express();
 /* 1 - Basic setup for express server. */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload());
 app.use(cors());
 app.use(traceMiddleware);
 
