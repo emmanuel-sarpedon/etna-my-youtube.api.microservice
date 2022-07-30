@@ -1,7 +1,34 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "~/init/database.init";
 
-export class Video extends Model {}
+export class Video extends Model {
+   declare id: number;
+   declare source: string;
+   declare createdAt: Date;
+   declare views: number;
+   declare enabled: boolean;
+   declare user: number;
+   declare format: {
+      1080: string;
+      720: string;
+      480: string;
+      360: string;
+      240: string;
+      144: string;
+   };
+
+   getPublicFields(): Partial<Video> {
+      return {
+         id: this.id,
+         source: this.source,
+         createdAt: this.createdAt,
+         views: this.views,
+         enabled: this.enabled,
+         user: this.user,
+         format: this.format,
+      };
+   }
+}
 
 Video.init(
    {
@@ -26,6 +53,14 @@ Video.init(
       },
       format: {
          type: DataTypes.JSONB,
+         defaultValue: {
+            "1080": "",
+            "720": "",
+            "480": "",
+            "360": "",
+            "240": "",
+            "144": "",
+         },
       },
    },
    { sequelize }
