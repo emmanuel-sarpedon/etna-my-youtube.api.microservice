@@ -3,7 +3,6 @@ import { UploadedFile } from "express-fileupload";
 import * as error from "~/errors/errors";
 import { CustomRequest } from "~/middlewares/auth.middleware";
 import * as service from "~/services/video.services";
-import * as fs from "fs";
 
 export async function addVideoToUser(req: CustomRequest, res: Response) {
    /* Make sure that the user is only able to upload videos to their own account. */
@@ -21,19 +20,10 @@ export async function addVideoToUser(req: CustomRequest, res: Response) {
       user: req.user.id,
    });
    const videoFolder = `${userFolder}/${videoInstance.id}`;
-   const videoPath = `${videoFolder}/${Date.now()}_${file.name}`;
+   const videoPath = service.generateVideoPath(videoFolder, req);
 
    /* Create a folder for the user to store their videos in. */
-   fs.mkdir(
-      videoFolder,
-      {
-         recursive: true,
-      },
-      (err) => {
-         if (err)
-            return error.badRequest(res, [err.name + " : " + err.message]);
-      }
-   );
+   service.createUserVideoFolder(videoFolder, res);
 
    /* Move uploaded file to correct folder */
    await file.mv(videoPath, async (err) => {
