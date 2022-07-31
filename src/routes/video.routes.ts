@@ -19,4 +19,12 @@ export const endpoints: Endpoint[] = [
       handler: controller.getVideos,
       description: "Get videos",
    },
+   {
+      method: "get",
+      path: "/user/:id/videos",
+      validatorSchema: validator.videoListByUserIdSchema,
+      authentication: "notRequired",
+      handler: controller.getVideosByUserId,
+      description: "Get videos by user id",
+   },
 ];

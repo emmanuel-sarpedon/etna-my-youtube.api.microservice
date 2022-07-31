@@ -40,7 +40,13 @@ export function createUserVideoFolder(videoFolder: string, res: Response) {
    );
 }
 
-export async function getVideos(fields: { [key: string]: string }) {
+export async function getVideos(fields: {
+   name: string;
+   user: number;
+   duration: number;
+   page: number;
+   perPage: number;
+}) {
    const { name, user, duration, page, perPage } = fields;
 
    let filter: { [key: string]: any } = {};
@@ -50,7 +56,7 @@ export async function getVideos(fields: { [key: string]: string }) {
          [Op.iLike]: `%${name}%`,
       };
 
-   if (user) filter.user = parseInt(user);
+   if (user) filter.user = user;
 
    return await Video.findAndCountAll({
       where: {
@@ -59,7 +65,21 @@ export async function getVideos(fields: { [key: string]: string }) {
             // duration: duration,
          },
       },
-      limit: parseInt(perPage),
-      offset: parseInt(perPage) * (parseInt(page) - 1),
+      limit: perPage,
+      offset: perPage * (page - 1),
+   });
+}
+
+export async function getVideosByUserId(
+   userId: number,
+   page: number,
+   perPage: number
+) {
+   return await Video.findAndCountAll({
+      where: {
+         user: userId,
+      },
+      limit: perPage,
+      offset: perPage * (page - 1),
    });
 }

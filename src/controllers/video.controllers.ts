@@ -61,3 +61,27 @@ export async function getVideos(req: Request, res: Response) {
       pager: { current: page, total: total },
    });
 }
+
+export async function getVideosByUserId(req: Request, res: Response) {
+   const { page, perPage } = req.body;
+
+   if (page === 0)
+      return error.badRequest(res, ["Page number must be greater than 0"]);
+
+   const { rows, count } = await service.getVideosByUserId(
+      parseInt(req.params.id),
+      parseInt(page),
+      parseInt(perPage)
+   );
+
+   const total = Math.ceil(count / perPage);
+
+   if (page > total && page > 1)
+      return error.badRequest(res, ["Page not found"]);
+
+   return res.status(200).json({
+      message: "Ok",
+      data: rows.map((video) => video.getPublicFields()),
+      pager: { current: page, total: total },
+   });
+}

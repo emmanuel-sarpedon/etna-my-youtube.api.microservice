@@ -9,3 +9,10 @@ export const videoListSchema = [
    body("page").isInt({ min: 0 }),
    body("perPage").isInt({ min: 1 }),
 ];
+
+export const videoListByUserIdSchema = [
+   param("id").isInt(),
+
+   body("page").isInt({ min: 0 }),
+   body("perPage").isInt({ min: 1 }),
+];
