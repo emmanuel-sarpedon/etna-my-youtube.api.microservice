@@ -1,8 +1,9 @@
 import { Video } from "~/models/video.model";
-import { Request, Response } from 'express'
+import { Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
 import fs from "fs";
 import * as error from "~/errors/errors";
+import { Op } from "sequelize";
 
 export async function createVideo(fields: { source: string; user: number }) {
    return await Video.create({
@@ -28,7 +29,7 @@ export function generateVideoPath(videoFolder: string, req: Request) {
 
 export function createUserVideoFolder(videoFolder: string, res: Response) {
    fs.mkdir(
-       videoFolder,
+      videoFolder,
       {
          recursive: true,
       },
@@ -37,4 +38,28 @@ export function createUserVideoFolder(videoFolder: string, res: Response) {
             return error.badRequest(res, [err.name + " : " + err.message]);
       }
    );
+}
+
+export async function getVideos(fields: { [key: string]: string }) {
+   const { name, user, duration, page, perPage } = fields;
+
+   let filter: { [key: string]: any } = {};
+
+   if (name)
+      filter.source = {
+         [Op.iLike]: `%${name}%`,
+      };
+
+   if (user) filter.user = parseInt(user);
+
+   return await Video.findAndCountAll({
+      where: {
+         [Op.and]: {
+            ...filter,
+            // duration: duration,
+         },
+      },
+      limit: parseInt(perPage),
+      offset: parseInt(perPage) * (parseInt(page) - 1),
+   });
 }
