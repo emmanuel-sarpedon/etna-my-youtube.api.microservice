@@ -3,3 +3,4 @@ dist
 .env
 .idea
 public/videos
+.DS_Store

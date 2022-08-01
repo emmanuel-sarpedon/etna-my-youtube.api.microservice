@@ -6,7 +6,7 @@ import { traceMiddleware } from "~/middlewares/trace.middleware";
 import log4js from "log4js";
 import fileUpload from "express-fileupload";
 
-const logger = log4js.getLogger("APP");
+const logger = log4js.getLogger("app.service");
 logger.level = "trace";
 
 export const app = express();

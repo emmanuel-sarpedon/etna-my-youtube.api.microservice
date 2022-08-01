@@ -7,6 +7,7 @@ export class Video extends Model {
    declare source: string;
    declare createdAt: Date;
    declare views: number;
+   declare duration: number | undefined;
    declare enabled: boolean;
    declare user: number;
    declare format: {

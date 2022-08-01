@@ -5,6 +5,8 @@ import { CustomRequest } from "~/middlewares/auth.middleware";
 import * as service from "~/services/video.services";
 import { Video } from "~/models/video.model";
 
+require("dotenv").config();
+
 export async function addVideoToUser(req: CustomRequest, res: Response) {
    /* Make sure that the user is only able to upload videos to their own account. */
    if (req.params.id !== req.user?.id.toString())
@@ -15,33 +17,29 @@ export async function addVideoToUser(req: CustomRequest, res: Response) {
    if (!file?.mimetype?.includes("video"))
       return error.badRequest(res, ["Invalid file type"]);
 
-   const userFolder = `public/videos/${req.user.id}`;
-   const videoPath = service.generateVideoPath(userFolder, req);
+   const videoInstance = await service.createVideo({
+      source: "",
+      user: req.user.id,
+   });
+
+   const videoFolder = `${process.env.PUBLIC_PATH}/sources/${req.user.id}/${videoInstance.id}`;
+   const videoPath = service.generateVideoPath(videoFolder, req);
 
    /* Create a folder for the user to store their videos in. */
-   service.createVideoFolder(userFolder, res);
+   await service.createVideoFolder(videoFolder, res);
 
    /* Move uploaded file to correct folder. */
    await file.mv(videoPath, async (err) => {
       if (err) return error.badRequest(res, [err]);
    });
 
+   videoInstance.source = videoPath;
+
    /* Getting the metadata of the video. */
    const metadata = await service.getVideoMetadata(videoPath);
+   if (metadata) videoInstance.duration = metadata.format?.duration;
 
-   const videoInstance = await (async (userId: number) => {
-      if (metadata.format?.duration)
-         return await service.createVideo({
-            source: videoPath,
-            user: userId,
-            duration: metadata.format.duration,
-         });
-
-      return await service.createVideo({
-         source: videoPath,
-         user: userId,
-      });
-   })(req.user?.id);
+   await videoInstance.save();
 
    return res.status(201).json({
       message: "Ok",
@@ -101,43 +99,22 @@ export async function getVideosByUserId(req: Request, res: Response) {
 
 export async function encodeVideo(req: Request, res: Response) {
    const { id } = req.params;
-   const { format } = req.body;
+   const { format, file } = req.body;
 
    const video: Video | null = await service.getVideoById(id);
    if (!video) return error.ressourcesNotFound(res);
-   const videoName = service.getVideoName(video);
-   if (!videoName) return error.badRequest(res, ["Video not found"]);
 
-   const encodedVideoFolderPath = service.generateEncodedVideoFolderPath(
-      video,
-      format
-   );
+   const JSONFormat = { ...video.format };
+   JSONFormat[format as keyof Video["format"]] = file;
 
-   await service.createVideoFolder(encodedVideoFolderPath, res);
+   video.format = JSONFormat;
 
-   const outputEncodedVideoPath = service.generateEncodedVideoPath(
-      encodedVideoFolderPath,
-      videoName
-   );
+   await video.save();
 
-   service
-      .encodeVideo(video.source, outputEncodedVideoPath, format)
-      .then(async () => {
-         const JSONFormat: Video["format"] = { ...video.format };
-         JSONFormat[format as keyof Video["format"]] = outputEncodedVideoPath;
-
-         const updatedVideo = await service.updateVideo(video, {
-            format: JSONFormat,
-         });
-
-         return res.status(200).json({
-            message: "Ok",
-            data: updatedVideo.getPublicFields(),
-         });
-      })
-      .catch((err) => {
-         return error.badRequest(res, [err.message]);
-      });
+   return res.status(200).json({
+      message: "Ok",
+      data: video.getPublicFields(),
+   });
 }
 
 export async function updateVideo(req: CustomRequest, res: Response) {
