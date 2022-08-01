@@ -17,31 +17,35 @@ logger.level = "trace";
  */
 const addEndpointsToRouter = (endpoints: Endpoint[], router: Router): void => {
    endpoints.forEach((endpoint: Endpoint, index: number) => {
-      const {
-         method,
-         path,
-         validatorSchema,
-         authentication,
-         handler,
-         description,
-      } = endpoint;
+      try {
+         const {
+            method,
+            path,
+            validatorSchema,
+            authentication,
+            handler,
+            description,
+         } = endpoint;
 
-      /* A dynamic way to add routes to the router. */
-      router[method](
-         path,
-         validatorSchema ? validatorSchema : [],
-         validatorSchema ? validatorMiddleware : [],
-         authentication === "required" ? requiredAuth : [],
-         authentication === "optional" ? optionalAuth : [],
-         handler
-      );
+         /* A dynamic way to add routes to the router. */
+         router[method](
+            path,
+            validatorSchema ? validatorSchema : [],
+            validatorSchema ? validatorMiddleware : [],
+            authentication === "required" ? requiredAuth : [],
+            authentication === "optional" ? optionalAuth : [],
+            handler
+         );
 
-      /* Logging the routes to the console. */
-      logger.trace(
-         //prettier-ignore
-         `﹒ ${index + 1} - [${method.toUpperCase()}] ${path} - ${description}`
-         // ﹒ 1 - [POST] /users - Register a new user
-      );
+         /* Logging the routes to the console. */
+         logger.trace(
+            //prettier-ignore
+            `﹒ ${index + 1} - [${method.toUpperCase()}] ${path} - ${description}`
+            // ﹒ 1 - [POST] /users - Register a new user
+         );
+      } catch (e) {
+         logger.error(e);
+      }
    });
 };
 

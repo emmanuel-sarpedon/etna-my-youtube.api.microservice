@@ -3,6 +3,7 @@ import { UploadedFile } from "express-fileupload";
 import * as error from "~/errors/errors";
 import { CustomRequest } from "~/middlewares/auth.middleware";
 import * as service from "~/services/video.services";
+import { Video } from "~/models/video.model";
 
 export async function addVideoToUser(req: CustomRequest, res: Response) {
    /* Make sure that the user is only able to upload videos to their own account. */
@@ -18,7 +19,7 @@ export async function addVideoToUser(req: CustomRequest, res: Response) {
    const videoPath = service.generateVideoPath(userFolder, req);
 
    /* Create a folder for the user to store their videos in. */
-   service.createUserVideoFolder(userFolder, res);
+   service.createVideoFolder(userFolder, res);
 
    /* Move uploaded file to correct folder. */
    await file.mv(videoPath, async (err) => {
@@ -81,7 +82,7 @@ export async function getVideosByUserId(req: Request, res: Response) {
       return error.badRequest(res, ["Page number must be greater than 0"]);
 
    const { rows, count } = await service.getVideosByUserId(
-      parseInt(req.params.id),
+      req.params.id,
       parseInt(page),
       parseInt(perPage)
    );
@@ -96,4 +97,45 @@ export async function getVideosByUserId(req: Request, res: Response) {
       data: rows.map((video) => video.getPublicFields()),
       pager: { current: page, total: total },
    });
+}
+
+export async function encodeVideo(req: Request, res: Response) {
+   const { id } = req.params;
+   const { format } = req.body;
+
+   const video: Video | null = await service.getVideoById(id);
+   if (!video) return error.badRequest(res, ["Video not found"]);
+   const videoName = service.getVideoName(video);
+   if (!videoName) return error.badRequest(res, ["Video not found"]);
+
+   const encodedVideoFolderPath = service.generateEncodedVideoFolderPath(
+      video,
+      format
+   );
+
+   await service.createVideoFolder(encodedVideoFolderPath, res);
+
+   const outputEncodedVideoPath = service.generateEncodedVideoPath(
+      encodedVideoFolderPath,
+      videoName
+   );
+
+   service
+      .encodeVideo(video.source, outputEncodedVideoPath, format)
+      .then(async () => {
+         const JSONFormat: Video["format"] = { ...video.format };
+         JSONFormat[format as keyof Video["format"]] = outputEncodedVideoPath;
+
+         const updatedVideo = await service.updateVideo(video, {
+            format: JSONFormat,
+         });
+
+         return res.status(200).json({
+            message: "Ok",
+            data: updatedVideo.getPublicFields(),
+         });
+      })
+      .catch((err) => {
+         return error.badRequest(res, [err.message]);
+      });
 }

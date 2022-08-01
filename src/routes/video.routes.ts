@@ -27,4 +27,12 @@ export const endpoints: Endpoint[] = [
       handler: controller.getVideosByUserId,
       description: "Get videos by user id",
    },
+   {
+      method: "patch",
+      path: "/video/:id",
+      validatorSchema: validator.videoEncodeSchema,
+      authentication: "notRequired",
+      handler: controller.encodeVideo,
+      description: "Encode video",
+   },
 ];

@@ -16,3 +16,10 @@ export const videoListByUserIdSchema = [
    body("page").isInt({ min: 0 }),
    body("perPage").isInt({ min: 1 }),
 ];
+
+export const videoEncodeSchema = [
+   param("id").isInt(),
+
+   body("format").isIn([1080, 720, 480, 360, 240, 144]),
+   body("file").isByteLength({ min: 1 }),
+];
