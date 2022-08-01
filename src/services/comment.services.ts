@@ -9,3 +9,19 @@ export async function createComment(fields: {
       ...fields,
    });
 }
+
+export async function getComments(fields: {
+   videoId: number;
+   page: number;
+   perPage: number;
+}) {
+   const { videoId, page, perPage } = fields;
+
+   return await Comment.findAndCountAll({
+      where: {
+         video: videoId,
+      },
+      limit: perPage,
+      offset: perPage * (page - 1),
+   });
+}

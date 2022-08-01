@@ -16,3 +16,26 @@ export async function createComment(req: CustomRequest, res: Response) {
       .status(201)
       .json({ message: "Ok", data: commentCreated.getPublicFields() });
 }
+
+export async function getComments(req: CustomRequest, res: Response) {
+   const { page, perPage } = req.body;
+
+   if (!req.user?.id) return error.badCredentials(res);
+
+   const { rows, count } = await service.getComments({
+      videoId: parseInt(req.params.id),
+      page: parseInt(page),
+      perPage: parseInt(perPage) || 5,
+   });
+
+   const total = Math.ceil(count / (perPage || 5));
+
+   if (page > total && page > 1)
+      return error.badRequest(res, ["Page not found"]);
+
+   return res.status(200).json({
+      message: "Ok",
+      data: rows.map((comment) => comment.getPublicFields()),
+      pager: { current: page, total: total },
+   });
+}
