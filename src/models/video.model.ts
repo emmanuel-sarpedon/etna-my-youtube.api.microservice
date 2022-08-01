@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "~/init/database.init";
+import { Comment } from '~/models/comment.model'
 
 export class Video extends Model {
    declare id: number;
@@ -69,3 +70,5 @@ Video.init(
    },
    { sequelize }
 );
+
+Video.hasMany(Comment, { foreignKey: "video" });

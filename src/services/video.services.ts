@@ -58,8 +58,8 @@ export async function getVideos(fields: {
             ...filter,
          },
       },
-      limit: perPage,
-      offset: perPage * (page - 1),
+      limit: perPage || 5,
+      offset: perPage || 5 * (page - 1),
    });
 }
 
@@ -191,7 +191,9 @@ export async function encodeVideo(
             resolve();
          })
          .on("progress", (progress) => {
-            logger.trace("Processing: " + Math.ceil(progress.percent) + "% done");
+            logger.trace(
+               "Processing: " + Math.ceil(progress.percent) + "% done"
+            );
          })
          .run();
    });

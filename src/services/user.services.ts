@@ -50,7 +50,7 @@ export async function getUserByLogin(login: string): Promise<User | null> {
 export async function getUsersByPseudo(
    pseudo: string,
    page: number,
-   perPage: number
+   perPage: number = 5
 ): Promise<{ rows: User[]; count: number }> {
    return await User.findAndCountAll({
       where: {

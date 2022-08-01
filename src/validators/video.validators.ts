@@ -21,13 +21,13 @@ export const videoEncodeSchema = [
    param("id").isInt(),
 
    body("format").isIn([1080, 720, 480, 360, 240, 144]),
-   body("file").isByteLength({ min: 1 }),
+   body("file").isString().notEmpty(),
 ];
 
 export const videoUpdateSchema = [
    param("id").isInt(),
 
-   body("name").isByteLength({ min: 1 }),
+   body("name").isString().notEmpty(),
    body("user").isInt(),
 ];
 
