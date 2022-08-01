@@ -2,6 +2,8 @@ import { Video } from "~/models/video.model";
 import { Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
 import fs from "fs";
+import fsAsync from "fs/promises";
+
 import * as error from "~/errors/errors";
 import { Op } from "sequelize";
 import log4js from "log4js";
@@ -128,6 +130,42 @@ export function createVideoFolder(videoFolder: string, res: Response) {
             return error.badRequest(res, [err.name + " : " + err.message]);
       }
    );
+}
+
+export function updateVideoPath(oldPath: string, newName: string): string {
+   return (
+      oldPath.split("/").slice(0, -1).join("/") +
+      "/" +
+      Date.now() +
+      "_" +
+      newName.split(".").slice(-1) +
+      "." +
+      oldPath.split(".").pop()
+   );
+}
+
+export async function updateVideoName(
+   video: Video,
+   newName: string
+): Promise<Video> {
+   const oldPath = video.source;
+   const newPath = updateVideoPath(oldPath, newName);
+
+   video.source = updateVideoPath(oldPath, newName);
+   await fsAsync.rename(oldPath, newPath);
+
+   for (const format of Object.keys(video.format)) {
+      const oldPath = video.format[format as unknown as keyof Video["format"]];
+
+      if (oldPath) {
+         const newPath = updateVideoPath(oldPath, newName);
+         video.format[format as unknown as keyof Video["format"]] = newPath;
+         await fsAsync.rename(oldPath, newPath);
+      }
+   }
+
+   await video.save();
+   return video;
 }
 
 export async function encodeVideo(

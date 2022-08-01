@@ -35,4 +35,12 @@ export const endpoints: Endpoint[] = [
       handler: controller.encodeVideo,
       description: "Encode video",
    },
+   {
+      method: "put",
+      path: "/video/:id",
+      validatorSchema: validator.videoUpdateSchema,
+      authentication: "required",
+      handler: controller.updateVideo,
+      description: "Update video",
+   },
 ];

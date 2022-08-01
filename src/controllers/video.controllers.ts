@@ -104,7 +104,7 @@ export async function encodeVideo(req: Request, res: Response) {
    const { format } = req.body;
 
    const video: Video | null = await service.getVideoById(id);
-   if (!video) return error.badRequest(res, ["Video not found"]);
+   if (!video) return error.ressourcesNotFound(res);
    const videoName = service.getVideoName(video);
    if (!videoName) return error.badRequest(res, ["Video not found"]);
 
@@ -138,4 +138,24 @@ export async function encodeVideo(req: Request, res: Response) {
       .catch((err) => {
          return error.badRequest(res, [err.message]);
       });
+}
+
+export async function updateVideo(req: CustomRequest, res: Response) {
+   const { id } = req.params;
+   const { name, user } = req.body;
+
+   if (user !== req.user?.id) return error.badCredentials(res);
+
+   const video: Video | null = await service.getVideoById(id);
+   if (!video) return error.ressourcesNotFound(res);
+
+   const updatedVideo = await service.updateVideoName(
+      video,
+      name.replaceAll(" ", "_")
+   );
+
+   return res.status(200).json({
+      message: "Ok",
+      data: updatedVideo.getPublicFields(),
+   });
 }
