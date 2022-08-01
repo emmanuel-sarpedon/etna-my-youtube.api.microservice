@@ -25,6 +25,7 @@
    "dependencies": {
       "@types/crypto-js": "^4.1.1",
       "@types/express-fileupload": "^1.2.3",
+      "@types/fluent-ffmpeg": "^2.1.20",
       "@types/jsonwebtoken": "^8.5.8",
       "body-parser": "^1.20.0",
       "cors": "^2.8.5",
@@ -33,6 +34,7 @@
       "express": "^4.18.1",
       "express-fileupload": "^1.4.0",
       "express-validator": "^6.14.2",
+      "fluent-ffmpeg": "^2.1.2",
       "jsonwebtoken": "^8.5.1",
       "log4js": "^6.6.1",
       "pg": "^8.7.3",

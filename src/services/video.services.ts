@@ -5,10 +5,19 @@ import fs from "fs";
 import * as error from "~/errors/errors";
 import { Op } from "sequelize";
 
-export async function createVideo(fields: { source: string; user: number }) {
+import ffmpeg, { FfprobeData } from "fluent-ffmpeg";
+if (process.env.FFMPEG_PATH) ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH);
+if (process.env.FFPROBE_PATH) ffmpeg.setFfprobePath(process.env.FFPROBE_PATH);
+
+export async function createVideo(fields: {
+   source: string;
+   user: number;
+   duration?: number;
+}) {
    return await Video.create({
       source: fields.source,
       user: fields.user,
+      duration: fields.duration,
    });
 }
 
@@ -49,20 +58,19 @@ export async function getVideos(fields: {
 }) {
    const { name, user, duration, page, perPage } = fields;
 
+   /* Filter builder. */
    let filter: { [key: string]: any } = {};
-
    if (name)
       filter.source = {
          [Op.iLike]: `%${name}%`,
       };
-
    if (user) filter.user = user;
+   if (duration) filter.duration = { [Op.gt]: duration };
 
    return await Video.findAndCountAll({
       where: {
          [Op.and]: {
             ...filter,
-            // duration: duration,
          },
       },
       limit: perPage,
@@ -81,5 +89,16 @@ export async function getVideosByUserId(
       },
       limit: perPage,
       offset: perPage * (page - 1),
+   });
+}
+
+export async function getVideoMetadata(
+   videoPath: string
+): Promise<FfprobeData> {
+   return await new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(videoPath, (err, metadata) => {
+         if (err) reject(err);
+         resolve(metadata);
+      });
    });
 }

@@ -20,19 +20,31 @@ export async function addVideoToUser(req: CustomRequest, res: Response) {
    /* Create a folder for the user to store their videos in. */
    service.createUserVideoFolder(userFolder, res);
 
-   /* Move uploaded file to correct folder */
+   /* Move uploaded file to correct folder. */
    await file.mv(videoPath, async (err) => {
       if (err) return error.badRequest(res, [err]);
    });
 
+   /* Getting the metadata of the video. */
+   const metadata = await service.getVideoMetadata(videoPath);
+
+   const videoInstance = await (async (userId: number) => {
+      if (metadata.format?.duration)
+         return await service.createVideo({
+            source: videoPath,
+            user: userId,
+            duration: metadata.format.duration,
+         });
+
+      return await service.createVideo({
+         source: videoPath,
+         user: userId,
+      });
+   })(req.user?.id);
+
    return res.status(201).json({
       message: "Ok",
-      data: (
-         await service.createVideo({
-            source: videoPath,
-            user: req.user.id,
-         })
-      ).getPublicFields(),
+      data: videoInstance.getPublicFields(),
    });
 }
 

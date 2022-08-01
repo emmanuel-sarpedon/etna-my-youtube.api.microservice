@@ -51,6 +51,10 @@ Video.init(
          allowNull: false,
          defaultValue: true,
       },
+      duration: {
+         type: DataTypes.FLOAT,
+         allowNull: true,
+      },
       format: {
          type: DataTypes.JSONB,
          defaultValue: {
