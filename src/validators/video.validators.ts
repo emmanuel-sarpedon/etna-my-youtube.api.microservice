@@ -30,3 +30,5 @@ export const videoUpdateSchema = [
    body("name").isByteLength({ min: 1 }),
    body("user").isInt(),
 ];
+
+export const videoDeleteSchema = [param("id").isInt()];

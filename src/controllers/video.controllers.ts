@@ -159,3 +159,16 @@ export async function updateVideo(req: CustomRequest, res: Response) {
       data: updatedVideo.getPublicFields(),
    });
 }
+
+export async function deleteVideo(req: CustomRequest, res: Response) {
+   const { id } = req.params;
+
+   const video: Video | null = await service.getVideoById(id);
+   if (!video) return error.ressourcesNotFound(res);
+
+   if (video.user !== req.user?.id) return error.badCredentials(res);
+
+   await service.deleteVideo(video);
+
+   return res.status(204).send();
+}

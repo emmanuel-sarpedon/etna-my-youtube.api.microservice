@@ -191,8 +191,27 @@ export async function encodeVideo(
             resolve();
          })
          .on("progress", (progress) => {
-            logger.trace("Processing: " + progress.percent + "% done");
+            logger.trace("Processing: " + Math.ceil(progress.percent) + "% done");
          })
          .run();
    });
+}
+
+export function deleteVideo(video: Video): void {
+   const logger = log4js.getLogger("VIDEO DELETE : " + video.id);
+   logger.level = "trace";
+
+   fs.rm(video.source, (err) => {
+      if (err) logger.error(err);
+   });
+
+   fs.rmdir(
+      video.source.split("/").slice(0, -1).join("/") + "/" + video.id,
+      { recursive: true },
+      (err) => {
+         if (err) logger.error(err);
+      }
+   );
+
+   video.destroy().then();
 }

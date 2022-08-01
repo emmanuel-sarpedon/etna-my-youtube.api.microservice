@@ -43,4 +43,12 @@ export const endpoints: Endpoint[] = [
       handler: controller.updateVideo,
       description: "Update video",
    },
+   {
+      method: "delete",
+      path: "/video/:id",
+      validatorSchema: validator.videoDeleteSchema,
+      authentication: "required",
+      handler: controller.deleteVideo,
+      description: "Delete video",
+   },
 ];
