@@ -26,7 +26,7 @@ export async function addVideoToUser(req: CustomRequest, res: Response) {
    const videoPath = service.generateVideoPath(videoFolder, req);
 
    /* Create a folder for the user to store their videos in. */
-   await service.createVideoFolder(videoFolder, res);
+   await service.createVideoFolder(videoFolder);
 
    /* Move uploaded file to correct folder. */
    await file.mv(videoPath, async (err) => {
