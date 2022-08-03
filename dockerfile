@@ -1,13 +1,4 @@
-FROM debian:buster
-
-FROM debian:buster
-RUN apt-get update -yq \
-&& apt-get install curl gnupg -yq \
-&& curl -sL https://deb.nodesource.com/setup_16.x | bash \
-&& apt-get install nodejs -yq \
-&& apt-get clean -y \
-&& apt-get install -y \
-    ffmpeg
+FROM node:16.0.0-alpine
 
 ADD . /app/
 

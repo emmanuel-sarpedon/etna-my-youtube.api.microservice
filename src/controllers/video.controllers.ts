@@ -4,8 +4,12 @@ import * as error from "~/errors/errors";
 import { CustomRequest } from "~/middlewares/auth.middleware";
 import * as service from "~/services/video.services";
 import { Video } from "~/models/video.model";
+import log4js from "log4js";
 
 require("dotenv").config();
+
+const logger = log4js.getLogger("video.controllers");
+logger.level = "trace";
 
 export async function addVideoToUser(req: CustomRequest, res: Response) {
    /* Make sure that the user is only able to upload videos to their own account. */
@@ -36,8 +40,13 @@ export async function addVideoToUser(req: CustomRequest, res: Response) {
    videoInstance.source = videoPath;
 
    /* Getting the metadata of the video. */
-   const metadata = await service.getVideoMetadata(videoPath);
-   if (metadata) videoInstance.duration = metadata.format?.duration;
+   try {
+      const metadata = await service.getVideoMetadata(videoPath);
+      if (metadata) videoInstance.duration = metadata.format?.duration;
+   } catch (e) {
+      logger.error("Error getting metadata: " + videoPath);
+      logger.mark(e);
+   }
 
    await videoInstance.save();
 

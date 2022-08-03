@@ -8,8 +8,8 @@ import { Op } from "sequelize";
 import log4js from "log4js";
 import ffmpeg, { FfprobeData } from "fluent-ffmpeg";
 
-if (process.env.FFMPEG_PATH) ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH);
-if (process.env.FFPROBE_PATH) ffmpeg.setFfprobePath(process.env.FFPROBE_PATH);
+ffmpeg.setFfmpegPath(require("@ffmpeg-installer/ffmpeg").path);
+ffmpeg.setFfprobePath(require("@ffprobe-installer/ffprobe").path);
 
 export async function createVideo(fields: {
    source: string;
@@ -48,7 +48,7 @@ export async function getVideos(fields: {
          },
       },
       limit: perPage || 5,
-      offset: perPage || 5 * (page - 1),
+      offset: (perPage || 5) * (page - 1),
    });
 }
 
