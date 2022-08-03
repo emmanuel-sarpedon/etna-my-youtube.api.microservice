@@ -50,11 +50,12 @@ const addEndpointsToRouter = (endpoints: Endpoint[], router: Router): void => {
 };
 
 export default () => {
-   const routes: string[] = fs.readdirSync("./src/routes");
+   const routes: string[] = fs.readdirSync(__dirname + "/../routes");
+   console.log(routes);
    const router: Router = Router();
 
    for (const route of routes) {
-      if (route.includes(".routes.ts")) {
+      if (route.includes(".routes.")) {
          try {
             logger.trace("Importing file " + route);
 
