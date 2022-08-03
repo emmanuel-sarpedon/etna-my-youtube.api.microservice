@@ -4,7 +4,12 @@ ADD . /app/
 
 WORKDIR /app
 
-RUN npm install && npm run build
+RUN npm install && npm run build && rm -rf \
+    src \
+    dockerfile \
+    package-lock.json \
+    tsconfig.json \
+    && npm cache clean --force
 
 EXPOSE 3000
 

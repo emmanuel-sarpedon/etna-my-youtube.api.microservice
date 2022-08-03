@@ -2,3 +2,6 @@ node_modules
 .git
 .idea
 .env
+public
+dist
+.DS_Store
